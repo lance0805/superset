@@ -111,7 +111,7 @@ RUN mkdir -p ${PYTHONPATH} superset/static requirements superset-frontend apache
         libsasl2-modules-gssapi-mit \
         libpq-dev \
         libecpg-dev \
-        libldap2-dev \
+        libldap2-dev  \
     && touch superset/static/version_info.json \
     && chown -R superset:superset ./* \
     && rm -rf /var/lib/apt/lists/*
@@ -122,10 +122,9 @@ COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 COPY --chown=superset:superset requirements/base.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/pip \
     apt-get update -qq && apt-get install -yqq --no-install-recommends \
-      build-essential \
+      build-essential gcc git wget \
     && pip install --no-cache-dir --upgrade setuptools pip \
     && pip install --no-cache-dir -r requirements/base.txt \
-    && apt-get autoremove -yqq --purge build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the compiled frontend assets

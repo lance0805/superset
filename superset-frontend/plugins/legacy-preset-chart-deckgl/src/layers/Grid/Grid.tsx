@@ -60,11 +60,17 @@ export function getLayer(
     .range()
     .map(color => hexToRGB(color)) as Color[];
   let data = payload.data.features;
-
+  let elevationScale=10;
   if (fd.js_data_mutator) {
     // Applying user defined data mutator if defined
     const jsFnMutator = sandboxedEval(fd.js_data_mutator);
-    data = jsFnMutator(data);
+    let raw_data = jsFnMutator(data);
+    if(raw_data.data){
+      data = raw_data.data;
+      elevationScale =raw_data.elevationScale || elevationScale
+    }else{
+      data = raw_data
+    }
   }
 
   const aggFunc = getAggFunc(fd.js_agg_function, p => p.weight);
@@ -78,6 +84,7 @@ export function getLayer(
     outline: false,
     // @ts-ignore
     getElevationValue: aggFunc,
+    elevationScale,
     // @ts-ignore
     getColorValue: aggFunc,
     ...commonLayerProps(fd, setTooltip, setTooltipContent),
